@@ -1,0 +1,5 @@
+selenium
+networkx
+community-louvain
+matplotlib
+webdriver-manager
