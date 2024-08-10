@@ -4,14 +4,13 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.algorithms import community
 from tqdm import tqdm
+import login
 
 # Initialize Instaloader
 L = instaloader.Instaloader()
 
 # Login
-USER = ''
-PASSWORD = ''
-L.login(USER, PASSWORD)
+L.login(login.USER, login.PASSWORD)
 
 # Load a post
 POST_URL = 'https://www.instagram.com/p/CwqU44wuHzK/?img_index=1'
