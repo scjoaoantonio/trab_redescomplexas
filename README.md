@@ -1,4 +1,4 @@
-# REDES COMPLEXAS - Análise de redes do instagram
+# Redes Complexas - Análise de redes no Instagram
 
 Este projeto é uma ferramenta automatizada para coletar seguidores de perfis do Instagram e criar uma rede visual dos relacionamentos entre esses perfis. Ele permite analisar centralidade e detecção de comunidades dentro da rede de seguidores utilizando técnicas de redes complexas.
 
