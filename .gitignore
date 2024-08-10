@@ -1,5 +1,6 @@
 # Ignorar arquivos de login
 login.py
+input/
 
 # Ignorar arquivos e pastas comuns
 *.pyc

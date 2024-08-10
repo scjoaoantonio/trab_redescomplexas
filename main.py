@@ -4,7 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.algorithms import community
 from tqdm import tqdm
-import login
+import input.login as login
 
 # Initialize Instaloader
 L = instaloader.Instaloader()
