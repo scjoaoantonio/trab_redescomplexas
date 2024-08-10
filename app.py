@@ -15,15 +15,17 @@ from webdriver_manager.chrome import ChromeDriverManager as CM
 
 # Função para salvar login
 def salvar_login(usuario, senha):
-    with open('login.txt', 'w') as arquivo:
+    if not os.path.exists('input'):
+        os.makedirs('input')
+    with open('input/login.txt', 'w') as arquivo:
         arquivo.write(f"{usuario}\n{senha}")
 
 # Função para carregar login
 def load_login():
-    if not os.path.exists('login.txt'):
+    if not os.path.exists('input/login.txt'):
         return None
 
-    with open('login.txt', 'r') as arquivo:
+    with open('input/login.txt', 'r') as arquivo:
         linhas = arquivo.readlines()
         if len(linhas) >= 2:
             return linhas[0].strip(), linhas[1].strip()
