@@ -1,10 +1,10 @@
 # Ignorar arquivos de login
 login.py
 input/
+input/login.py
 
 # Ignorar arquivos e pastas comuns
 *.pyc
 __pycache__/
 env/
 .vscode/
-input/login.py
