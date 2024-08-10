@@ -2,6 +2,7 @@
 login.py
 input/
 input/login.py
+login.txt
 
 # Ignorar arquivos e pastas comuns
 *.pyc
