@@ -200,6 +200,34 @@ def view_network(G):
 
     return centralidade, particao
 
+# Função para calcular e salvar análises descritivas
+def analise_descritiva(G):
+    # Número de nós e arestas
+    n_nos = G.number_of_nodes()
+    n_arestas = G.number_of_edges()
+    densidade = nx.density(G)
+    
+    # Distribuição de graus
+    distribuicao_graus = dict(nx.degree(G))
+    
+    # Coeficiente de clustering
+    clustering = nx.clustering(G)
+    
+    # Salvando resultados
+    if not os.path.exists('output'):
+        os.makedirs('output')
+    
+    with open('output/analise_descritiva.txt', 'w') as f:
+        f.write(f"Número de nós: {n_nos}\n")
+        f.write(f"Número de arestas: {n_arestas}\n")
+        f.write(f"Densidade da rede: {densidade:.4f}\n")
+        f.write("Distribuição de graus:\n")
+        for node, degree in distribuicao_graus.items():
+            f.write(f"{node}: {degree}\n")
+        f.write("Coeficiente de clustering:\n")
+        for node, coeff in clustering.items():
+            f.write(f"{node}: {coeff:.4f}\n")
+
 # Função principal
 if __name__ == '__main__':
     TIMEOUT = 15
@@ -215,3 +243,6 @@ if __name__ == '__main__':
     print("Centralidade de Grau dos usuários:")
     for usuario, cent in centralidade.items():
         print(f"{usuario}: {cent:.4f}")
+    
+    # Realizar a análise descritiva e salvar os resultados
+    analise_descritiva(G)
