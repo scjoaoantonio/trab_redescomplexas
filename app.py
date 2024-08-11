@@ -10,6 +10,7 @@ from selenium.webdriver.chrome.service import Service
 import networkx as nx
 import community as community_louvain
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager as CM
 
@@ -96,7 +97,6 @@ def scrape_seguidores(bot, usuario, qtd_usuarios):
     with open(f'output/{usuario}_seguidores.txt', 'a') as arquivo:
         arquivo.write('\n'.join(usuarios) + "\n")
 
-
 def load_users(filename):
     with open(filename, 'r') as file:
         usuarios = file.readlines()
@@ -161,12 +161,41 @@ def view_network(G):
     
     # Detecção de comunidades
     particao = community_louvain.best_partition(G)
-
-    # Visualização da rede
-    pos = nx.spring_layout(G)
-    plt.figure(figsize=(12, 12))
-    nx.draw(G, pos, node_color=list(particao.values()), with_labels=True, node_size=50, cmap=plt.cm.jet)
-    plt.title("Rede de Seguidores do Instagram")
+    
+    # Posicionamento dos nós
+    pos = nx.spring_layout(G, seed=42)  # Usar seed para layout consistente entre execuções
+    
+    # Cores para as comunidades
+    comunidades = set(particao.values())
+    cores = list(mcolors.CSS4_COLORS.values())[:len(comunidades)]
+    mapa_cores = {com: cor for com, cor in zip(comunidades, cores)}
+    
+    # Tamanho dos nós baseado na centralidade
+    tamanho_nos = [v * 5000 for v in centralidade.values()]  # Escala para o tamanho dos nós
+    
+    plt.figure(figsize=(14, 14))
+    
+    # Desenhar a rede com as configurações
+    nx.draw_networkx_nodes(
+        G, pos, node_color=[mapa_cores[particao[node]] for node in G.nodes()],
+        node_size=tamanho_nos, alpha=0.9
+    )
+    
+    # Desenhar as arestas
+    nx.draw_networkx_edges(G, pos, alpha=0.5, edge_color='gray')
+    
+    # Desenhar os rótulos dos nós
+    nx.draw_networkx_labels(G, pos, font_size=10, font_color='black')
+    
+    # Legenda para as comunidades
+    for com in comunidades:
+        plt.scatter([], [], color=mapa_cores[com], label=f'Comunidade {com + 1}')
+    
+    plt.legend(scatterpoints=1, frameon=False, labelspacing=1, loc='best')
+    
+    # Título da visualização
+    plt.title("Rede de Seguidores do Instagram", size=15)
+    plt.axis('off')  # Desliga os eixos
     plt.show()
 
     return centralidade, particao
