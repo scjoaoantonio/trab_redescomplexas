@@ -96,6 +96,14 @@ def scrape_seguidores(bot, usuario, qtd_usuarios):
     with open(f'output/{usuario}_seguidores.txt', 'a') as arquivo:
         arquivo.write('\n'.join(usuarios) + "\n")
 
+
+def load_users(filename):
+    with open(filename, 'r') as file:
+        usuarios = file.readlines()
+    # Remove espaços e quebras de linha de cada linha do arquivo
+    usuarios = [usuario.strip() for usuario in usuarios]
+    return usuarios
+
 # Função principal de raspagem
 def scrape():
     credenciais = load_login()
@@ -107,7 +115,8 @@ def scrape():
 
     qtd_usuarios = int(input('Quantos seguidores você quer coletar (100-2000 recomendado): '))
 
-    usuarios = input("Digite os @s do Instagram que você quer coletar (separados por vírgula): ").split(",")
+    # Carregando os usuários do arquivo txt
+    usuarios = load_users('input/usuarios.txt')
 
     servico = Service()
     opcoes = webdriver.ChromeOptions()
@@ -124,12 +133,11 @@ def scrape():
     login_instagram(bot, usuario, senha)
 
     for usuario in usuarios:
-        usuario = usuario.strip()
         scrape_seguidores(bot, usuario, qtd_usuarios)
 
     bot.quit()
 
-    return [f'output/{usuario.strip()}_seguidores.txt' for usuario in usuarios]
+    return [f'output/{usuario}_seguidores.txt' for usuario in usuarios]
 
 # Função para construir a rede
 def network(arquivos_usuarios):
