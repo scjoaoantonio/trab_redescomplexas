@@ -16,7 +16,12 @@ from webdriver_manager.chrome import ChromeDriverManager as CM
 
 TIMEOUT = 15
 
-
+# Função para salvar mensagens em um arquivo de log
+def log_message(message):
+    if not os.path.exists('output'):
+        os.makedirs('output')
+    with open('output/log.txt', 'a') as f:
+        f.write(message + "\n")
 
 # Função para salvar login
 def salvar_login(usuario, senha):
@@ -54,9 +59,9 @@ def login_instagram(bot, usuario, senha):
         elemento = bot.find_element(By.XPATH, "/html/body/div[4]/div/div/div[3]/div[2]/button")
         elemento.click()
     except NoSuchElementException:
-        print("[Info] - O Instagram não exigiu a aceitação de cookies desta vez.")
+        log_message("[Info] - O Instagram não exigiu a aceitação de cookies desta vez.")
 
-    print("[Info] - Fazendo login...")
+    log_message("[Info] - Fazendo login...")
     input_usuario = WebDriverWait(bot, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='username']")))
     input_senha = WebDriverWait(bot, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='password']")))
 
@@ -75,7 +80,7 @@ def scrape_seguidores(bot, usuario, qtd_usuarios):
     time.sleep(3.5)
     WebDriverWait(bot, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//a[contains(@href, '/followers')]"))).click()
     time.sleep(2)
-    print(f"[Info] - Coletando os seguidores de {usuario}...")
+    log_message(f"[Info] - Coletando os seguidores de {usuario}...")
 
     usuarios = set()
 
@@ -93,11 +98,7 @@ def scrape_seguidores(bot, usuario, qtd_usuarios):
 
     usuarios = list(usuarios)[:qtd_usuarios]  # Limita o número de seguidores ao número desejado
 
-    # Verifica se o diretório 'output' existe, e cria se não existir
-    if not os.path.exists('output'):
-        os.makedirs('output')
-
-    print(f"[Info] - Salvando seguidores de {usuario}...")
+    log_message(f"[Info] - Salvando seguidores de {usuario}...")
     with open(f'output/{usuario}_seguidores.txt', 'a') as arquivo:
         arquivo.write('\n'.join(usuarios) + "\n")
 
@@ -204,11 +205,11 @@ def view_network(G, save_fig=False):
     try:
         if save_fig:
             plt.savefig('output/network_visualization.png')
-            print("[Info] - Network visualization saved to 'output/network_visualization.png'")
+            log_message("[Info] - Network visualization saved to 'output/network_visualization.png'")
         else:
             plt.show()
     except KeyboardInterrupt:
-        print("\n[Info] - Visualization interrupted by the user.")
+        log_message("[Info] - Visualization interrupted by the user.")
 
     return centralidade, particao
 
@@ -240,7 +241,7 @@ def analise_descritiva(G):
         for node, coef in clustering.items():
             f.write(f"{node}: {coef:.4f}\n")
     
-    print("[Info] - Análise descritiva salva em 'output/analise_descritiva.txt'")
+    log_message("[Info] - Análise descritiva salva em 'output/analise_descritiva.txt'")
 
 # Importações já incluídas no seu código anterior
 
@@ -298,17 +299,17 @@ if __name__ == '__main__':
     plot_distribution(G)
     analise_descritiva(G)
     
-    # Exemplo de impressão de centralidade
-    print("Centralidade de Grau dos usuários:")
+    # Exemplo de escrita de centralidade em log
+    log_message("Centralidade de Grau dos usuários:")
     for usuario, cent in centralidade.items():
-        print(f"{usuario}: {cent:.4f}")
+        log_message(f"{usuario}: {cent:.4f}")
     
-    # Exemplo de impressão de betweenness
-    print("Centralidade de Betweenness dos usuários:")
+    # Exemplo de escrita de betweenness em log
+    log_message("Centralidade de Betweenness dos usuários:")
     for usuario, bet in betweenness.items():
-        print(f"{usuario}: {bet:.4f}")
+        log_message(f"{usuario}: {bet:.4f}")
     
-    # Exemplo de impressão de closeness
-    print("Centralidade de Closeness dos usuários:")
+    # Exemplo de escrita de closeness em log
+    log_message("Centralidade de Closeness dos usuários:")
     for usuario, close in closeness.items():
-        print(f"{usuario}: {close:.4f}")
+        log_message(f"{usuario}: {close:.4f}")
