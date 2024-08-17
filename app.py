@@ -204,6 +204,8 @@ def view_network(G, save_fig=False):
     
     try:
         if save_fig:
+            if not os.path.exists('output'):
+                os.makedirs('output')
             plt.savefig('output/network_visualization.png')
             log_message("[Info] - Network visualization saved to 'output/network_visualization.png'")
         else:
@@ -243,18 +245,16 @@ def analise_descritiva(G):
     
     log_message("[Info] - Análise descritiva salva em 'output/analise_descritiva.txt'")
 
-# Importações já incluídas no seu código anterior
-
+# Função para calcular a centralidade de betweenness
 def centralidade_betweenness(G):
-    """Calcula a centralidade de betweenness."""
     return nx.betweenness_centrality(G)
 
+# Função para calcular a centralidade de closeness
 def centralidade_closeness(G):
-    """Calcula a centralidade de closeness."""
     return nx.closeness_centrality(G)
 
+# Função para plotar a distribuição de graus
 def plot_distribution(G):
-    """Plota a distribuição de graus da rede."""
     degrees = [G.degree(n) for n in G.nodes()]
     plt.figure(figsize=(10, 6))
     plt.hist(degrees, bins=30, color='blue', alpha=0.7)
@@ -263,13 +263,12 @@ def plot_distribution(G):
     plt.ylabel("Frequência")
     plt.show()
 
-def view_network(G):
-    # Mantém a visualização existente, adicionar chamadas para novas centralidades
+# Função principal para visualização da rede
+def view_network(G, save_fig=False):
     centralidade = nx.degree_centrality(G)
     betweenness = centralidade_betweenness(G)
     closeness = centralidade_closeness(G)
     
-    # Continuar com a parte de visualização como já está
     particao = community_louvain.best_partition(G)
     pos = nx.spring_layout(G, seed=42)
     comunidades = set(particao.values())
@@ -286,8 +285,18 @@ def view_network(G):
     plt.legend(scatterpoints=1, frameon=False, labelspacing=1, loc='best')
     plt.title("Rede de Seguidores do Instagram", size=15)
     plt.axis('off')
-    plt.show()
 
+    try:
+        if save_fig:
+            if not os.path.exists('output'):
+                os.makedirs('output')
+            plt.savefig('output/network_visualization.png')
+            log_message("[Info] - Network visualization saved to 'output/network_visualization.png'")
+        else:
+            plt.show()
+    except KeyboardInterrupt:
+        log_message("[Info] - Visualization interrupted by the user.")
+    
     return centralidade, betweenness, closeness, particao
 
 # Função principal
@@ -295,7 +304,7 @@ if __name__ == '__main__':
     TIMEOUT = 15
     usuarios = scrape()
     G = network(usuarios)
-    centralidade, betweenness, closeness, particao = view_network(G)
+    centralidade, betweenness, closeness, particao = view_network(G, save_fig=True)  # Adicione save_fig=True para salvar a imagem
     plot_distribution(G)
     analise_descritiva(G)
     
