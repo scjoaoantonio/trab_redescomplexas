@@ -253,15 +253,15 @@ def centralidade_betweenness(G):
 def centralidade_closeness(G):
     return nx.closeness_centrality(G)
 
-# Função para plotar a distribuição de graus
-def plot_distribution(G):
-    degrees = [G.degree(n) for n in G.nodes()]
-    plt.figure(figsize=(10, 6))
-    plt.hist(degrees, bins=30, color='blue', alpha=0.7)
-    plt.title("Distribuição de Graus")
-    plt.xlabel("Grau")
-    plt.ylabel("Frequência")
-    plt.show()
+# # Função para plotar a distribuição de graus
+# def plot_distribution(G):
+#     degrees = [G.degree(n) for n in G.nodes()]
+#     plt.figure(figsize=(10, 6))
+#     plt.hist(degrees, bins=30, color='blue', alpha=0.7)
+#     plt.title("Distribuição de Graus")
+#     plt.xlabel("Grau")
+#     plt.ylabel("Frequência")
+#     plt.show()
 
 # Função principal para visualização da rede
 def view_network(G, save_fig=False):
@@ -305,7 +305,7 @@ if __name__ == '__main__':
     usuarios = scrape()
     G = network(usuarios)
     centralidade, betweenness, closeness, particao = view_network(G, save_fig=True)  # Adicione save_fig=True para salvar a imagem
-    plot_distribution(G)
+    # plot_distribution(G)
     analise_descritiva(G)
     
     # Exemplo de escrita de centralidade em log
