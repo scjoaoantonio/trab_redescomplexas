@@ -78,10 +78,12 @@ def login_instagram(bot, usuario, senha):
 def scrape_seguidores(bot, usuario, qtd_usuarios):
     bot.get(f'https://www.instagram.com/{usuario}/')
     time.sleep(3.5)
-    WebDriverWait(bot, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//a[contains(@href, '/followers')]"))).click()
-    time.sleep(2)
+    WebDriverWait(bot, TIMEOUT).until(EC.presence_of_element_located((By.XPATH, "//a[contains(@href, '/followers/')]"))).click()
+    time.sleep(3.5)
     log_message(f"[Info] - Coletando os seguidores de {usuario}...")
-
+    bot.get(f'https://www.instagram.com/{usuario}/followers/mutualFirst')
+    time.sleep(3.5)
+    log_message(f"[Info] - Acessando seguidores mútuos de {usuario}...")
     usuarios = set()
 
     while len(usuarios) < qtd_usuarios:
