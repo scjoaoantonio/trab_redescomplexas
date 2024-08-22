@@ -162,36 +162,39 @@ def network(arquivos_usuarios):
     return G
 
 # Função para analisar e visualizar a rede
-def view_network(G, save_fig=False):
-    # Centralidade de grau
+def view_network(G, selected_users=None, save_fig=False):
     centralidade = nx.degree_centrality(G)
+    betweenness = centralidade_betweenness(G)
+    closeness = centralidade_closeness(G)
     
-    # Detecção de comunidades
     particao = community_louvain.best_partition(G)
-    
-    # Posicionamento dos nós
-    pos = nx.spring_layout(G, seed=42)  # Usar seed para layout consistente entre execuções
-    
-    # Cores para as comunidades
+    pos = nx.spring_layout(G, seed=42)
     comunidades = set(particao.values())
     cores = list(mcolors.CSS4_COLORS.values())[:len(comunidades)]
     mapa_cores = {com: cor for com, cor in zip(comunidades, cores)}
-    
-    # Tamanho dos nós baseado na centralidade
-    tamanho_nos = [v * 5000 for v in centralidade.values()]  # Escala para o tamanho dos nós
+    tamanho_nos = [v * 5000 for v in centralidade.values()]
     
     plt.figure(figsize=(14, 14))
     
-    # Desenhar a rede com as configurações
+    # Desenhar as arestas primeiro para ficar em segundo plano
+    nx.draw_networkx_edges(G, pos, alpha=0.5, edge_color='gray')
+    
+    # Desenhar os nós das comunidades (fundo)
     nx.draw_networkx_nodes(
         G, pos, node_color=[mapa_cores[particao[node]] for node in G.nodes()],
         node_size=tamanho_nos, alpha=0.9
     )
     
-    # Desenhar as arestas
-    nx.draw_networkx_edges(G, pos, alpha=0.5, edge_color='gray')
+    # Destacar os nós selecionados
+    if selected_users:
+        selected_nodes = [node for node in G.nodes() if node in selected_users]
+        nx.draw_networkx_nodes(
+            G, pos, nodelist=selected_nodes, node_color='red',
+            node_size=[tamanho_nos[G.nodes().index(node)] * 1.5 for node in selected_nodes],
+            edgecolors='black', linewidths=2.5, alpha=1
+        )
     
-    # Desenhar os rótulos dos nós
+    # Desenhar os rótulos dos nós por último para sobrepor tudo
     nx.draw_networkx_labels(G, pos, font_size=10, font_color='black')
     
     # Legenda para as comunidades
@@ -199,11 +202,9 @@ def view_network(G, save_fig=False):
         plt.scatter([], [], color=mapa_cores[com], label=f'Comunidade {com + 1}')
     
     plt.legend(scatterpoints=1, frameon=False, labelspacing=1, loc='best')
-    
-    # Título da visualização
     plt.title("Rede de Seguidores do Instagram", size=15)
-    plt.axis('off')  # Desliga os eixos
-    
+    plt.axis('off')
+
     try:
         if save_fig:
             if not os.path.exists('output'):
@@ -214,8 +215,9 @@ def view_network(G, save_fig=False):
             plt.show()
     except KeyboardInterrupt:
         log_message("[Info] - Visualization interrupted by the user.")
+    
+    return centralidade, betweenness, closeness, particao
 
-    return centralidade, particao
 
 # Função para calcular e salvar análises descritivas
 def analise_descritiva(G):
