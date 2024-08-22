@@ -269,32 +269,54 @@ def centralidade_closeness(G):
 
 # Função principal para visualização da rede
 def view_network(G, save_fig=False):
+    # Centralidade (Grau)
     centralidade = nx.degree_centrality(G)
+    
+    # Centralidade de Betweenness e Closeness
     betweenness = centralidade_betweenness(G)
     closeness = centralidade_closeness(G)
     
+    # Detectando as comunidades
     particao = community_louvain.best_partition(G)
-    pos = nx.spring_layout(G, seed=42)
+    
+    # Ajuste de layout usando spring_layout para espaçar bem os nós
+    pos = nx.spring_layout(G, seed=42, k=0.1, iterations=50)
+    
+    # Comunidades
     comunidades = set(particao.values())
     cores = list(mcolors.CSS4_COLORS.values())[:len(comunidades)]
     mapa_cores = {com: cor for com, cor in zip(comunidades, cores)}
-    tamanho_nos = [v * 5000 for v in centralidade.values()]
     
-    plt.figure(figsize=(14, 14))
-    nx.draw_networkx_nodes(G, pos, node_color=[mapa_cores[particao[node]] for node in G.nodes()], node_size=tamanho_nos, alpha=0.9)
-    nx.draw_networkx_edges(G, pos, alpha=0.5, edge_color='gray')
-    nx.draw_networkx_labels(G, pos, font_size=10, font_color='black')
+    # Tamanho dos nós proporcional à centralidade de grau
+    tamanho_nos = [v * 7000 for v in centralidade.values()]
+    
+    plt.figure(figsize=(16, 16))
+    
+    # Desenho das arestas
+    nx.draw_networkx_edges(G, pos, alpha=0.3, edge_color='gray', width=0.5)
+    
+    # Desenho dos nós (comunidades)
+    nx.draw_networkx_nodes(
+        G, pos, node_color=[mapa_cores[particao[node]] for node in G.nodes()],
+        node_size=tamanho_nos, alpha=0.9
+    )
+    
+    # Desenho dos rótulos dos nós
+    nx.draw_networkx_labels(G, pos, font_size=9, font_color='black')
+    
+    # Legenda para as comunidades
     for com in comunidades:
         plt.scatter([], [], color=mapa_cores[com], label=f'Comunidade {com + 1}')
+    
     plt.legend(scatterpoints=1, frameon=False, labelspacing=1, loc='best')
     plt.title("Rede de Seguidores do Instagram", size=15)
     plt.axis('off')
-
+    
     try:
         if save_fig:
             if not os.path.exists('output'):
                 os.makedirs('output')
-            plt.savefig('output/network_visualization.png')
+            plt.savefig('output/network_visualization.png', dpi=300)
             log_message("[Info] - Network visualization saved to 'output/network_visualization.png'")
         else:
             plt.show()
@@ -302,6 +324,30 @@ def view_network(G, save_fig=False):
         log_message("[Info] - Visualization interrupted by the user.")
     
     return centralidade, betweenness, closeness, particao
+
+# Função principal
+if __name__ == '__main__':
+    TIMEOUT = 15
+    usuarios = scrape()
+    G = network(usuarios)
+    centralidade, betweenness, closeness, particao = view_network(G, save_fig=True)
+    analise_descritiva(G)
+    
+    # Exemplo de escrita de centralidade em log
+    log_message("Centralidade de Grau dos usuários:")
+    for usuario, cent in centralidade.items():
+        log_message(f"{usuario}: {cent:.4f}")
+    
+    # Exemplo de escrita de betweenness em log
+    log_message("Centralidade de Betweenness dos usuários:")
+    for usuario, bet in betweenness.items():
+        log_message(f"{usuario}: {bet:.4f}")
+    
+    # Exemplo de escrita de closeness em log
+    log_message("Centralidade de Closeness dos usuários:")
+    for usuario, close in closeness.items():
+        log_message(f"{usuario}: {close:.4f}")
+
 
 # Função principal
 if __name__ == '__main__':
